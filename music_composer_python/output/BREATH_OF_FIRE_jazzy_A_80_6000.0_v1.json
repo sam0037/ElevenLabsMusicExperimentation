@@ -1,0 +1,251 @@
+{
+"name": "jazzy_A_80_30000",
+"instrumental_only": true,
+"loopable": true,
+"feeling": "jazzy",
+"key": "A",
+"bpm": 80,
+"timeSignature": "4/4",
+"harmony": {
+"modeBase": "Mixolydian",
+"scale": [
+"A",
+"B",
+"C#",
+"D",
+"E",
+"F#",
+"G"
+],
+"progression": [
+"ii7",
+"V7",
+"Imaj7",
+"VI7"
+]
+},
+"sections": [
+{
+"section": "s1",
+"instrumental": true,
+"lines": [],
+"degree": "ii7",
+"modeColor": "Aeolian",
+"chord": {
+"name": "B(sus2)",
+"notes": [
+"B",
+"C",
+"F#"
+]
+},
+"drone": [
+"B"
+],
+"bass": "B",
+"layers": [
+"drone",
+"pad"
+],
+"percussion": "groove",
+"brightness": 0.49,
+"density": 0.39,
+"movement": 0.46,
+"expression": {
+"filterCutoffHz": 4022,
+"noteDensity": 4,
+"layersCount": 2,
+"lfoRateHz": 2.35,
+"register": "mid"
+},
+"instruments": {
+"ambient": [
+"tanpura",
+"shruti_box",
+"harmonium_drone"
+],
+"melodic": [
+"bansuri",
+"cello"
+],
+"percussion": [
+"frame_drum",
+"low_tom"
+],
+"texture": [
+"reverse_swell"
+],
+"others": []
+},
+"duration_ms": 30000
+},
+{
+"section": "s2",
+"instrumental": true,
+"lines": [],
+"degree": "V7",
+"modeColor": "Aeolian",
+"chord": {
+"name": "E(sus2)",
+"notes": [
+"E",
+"F",
+"B"
+]
+},
+"drone": [
+"E",
+"B"
+],
+"bass": "E",
+"layers": [
+"drone",
+"pad",
+"texture"
+],
+"percussion": "groove",
+"brightness": 0.46,
+"density": 0.45,
+"movement": 0.52,
+"expression": {
+"filterCutoffHz": 3788,
+"noteDensity": 5,
+"layersCount": 2,
+"lfoRateHz": 2.65,
+"register": "mid"
+},
+"instruments": {
+"ambient": [
+"tanpura",
+"shruti_box",
+"harmonium_drone"
+],
+"melodic": [
+"bansuri",
+"cello"
+],
+"percussion": [
+"frame_drum",
+"low_tom"
+],
+"texture": [
+"reverse_swell"
+],
+"others": []
+},
+"duration_ms": 30000
+},
+{
+"section": "s3",
+"instrumental": true,
+"lines": [],
+"degree": "Imaj7",
+"modeColor": "Aeolian",
+"chord": {
+"name": "A(sus2)",
+"notes": [
+"A",
+"B",
+"E"
+]
+},
+"drone": [
+"A",
+"E"
+],
+"bass": "A",
+"layers": [
+"drone",
+"pad",
+"texture"
+],
+"percussion": "groove",
+"brightness": 0.43,
+"density": 0.54,
+"movement": 0.58,
+"expression": {
+"filterCutoffHz": 3554,
+"noteDensity": 5,
+"layersCount": 3,
+"lfoRateHz": 2.95,
+"register": "mid"
+},
+"instruments": {
+"ambient": [
+"tanpura",
+"shruti_box",
+"harmonium_drone"
+],
+"melodic": [
+"bansuri",
+"cello"
+],
+"percussion": [
+"frame_drum",
+"low_tom"
+],
+"texture": [
+"reverse_swell",
+"granular_air"
+],
+"others": []
+},
+"duration_ms": 30000
+},
+{
+"section": "s4",
+"instrumental": true,
+"lines": [],
+"degree": "VI7",
+"modeColor": "Aeolian",
+"chord": {
+"name": "F#(sus2)",
+"notes": [
+"F#",
+"G",
+"C#"
+]
+},
+"drone": [
+"F#"
+],
+"bass": "F#",
+"layers": [
+"drone",
+"pad",
+"texture"
+],
+"percussion": "groove",
+"brightness": 0.49,
+"density": 0.42,
+"movement": 0.46,
+"expression": {
+"filterCutoffHz": 4022,
+"noteDensity": 4,
+"layersCount": 2,
+"lfoRateHz": 2.35,
+"register": "mid"
+},
+"instruments": {
+"ambient": [
+"tanpura",
+"shruti_box",
+"harmonium_drone"
+],
+"melodic": [
+"bansuri",
+"cello"
+],
+"percussion": [
+"frame_drum",
+"low_tom"
+],
+"texture": [
+"reverse_swell"
+],
+"others": []
+},
+"duration_ms": 30000
+}
+]
+}

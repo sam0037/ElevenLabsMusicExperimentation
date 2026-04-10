@@ -1,0 +1,190 @@
+{
+  "somatic_tools": [
+    {
+      "id": "PHYSIOLOGICAL_SIGH",
+      "nervous_system_direction": "strong_down",
+      "description": "A double inhale followed by a long exhale that rapidly reduces stress and emotional activation.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Deep Drone Meditation"],
+      "tempo_range_bpm": [48, 60],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "COHERENT_BREATHING",
+      "nervous_system_direction": "down",
+      "description": "Slow rhythmic breathing (~5–6 breaths per minute) that stabilizes the nervous system.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Nature Immersion"],
+      "tempo_range_bpm": [50, 65],
+      "texture_density": "low"
+    },
+    {
+      "id": "EXTENDED_EXHALE_BREATHING",
+      "nervous_system_direction": "down",
+      "description": "Breathing with longer exhales than inhales to activate the parasympathetic response.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Deep Drone Meditation"],
+      "tempo_range_bpm": [45, 60],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "AWARENESS_PAUSE",
+      "nervous_system_direction": "down",
+      "description": "A mindful check-in to notice sensations and emotional shifts.",
+      "preferred_music_styles": ["Deep Drone Meditation", "Zen Minimal (Japanese style)"],
+      "tempo_range_bpm": [40, 55],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "BHRAMARI",
+      "nervous_system_direction": "down",
+      "description": "A humming exhale that increases vagal tone and quiets mental noise.",
+      "preferred_music_styles": ["Indian Meditation", "Deep Drone Meditation"],
+      "tempo_range_bpm": [45, 60],
+      "texture_density": "low"
+    },
+    {
+      "id": "ALTERNATE_NOSTRIL_BREATHING",
+      "nervous_system_direction": "down",
+      "description": "Structured nostril breathing that balances emotional and cognitive systems.",
+      "preferred_music_styles": ["Indian Meditation", "Classic Calm Ambient"],
+      "tempo_range_bpm": [50, 65],
+      "texture_density": "low"
+    },
+    {
+      "id": "FOUR_FIVE_SIX_BREATHING",
+      "nervous_system_direction": "strong_down",
+      "description": "Paced breathing ratio promoting sedation and sleep readiness.",
+      "preferred_music_styles": ["Deep Drone Meditation", "Sound Healing Bowl Session"],
+      "tempo_range_bpm": [40, 55],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "BODY_SCAN",
+      "nervous_system_direction": "down",
+      "description": "Guided attention through the body to release muscular tension.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Nature Immersion"],
+      "tempo_range_bpm": [45, 60],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "PROGRESSIVE_MUSCLE_RELAXATION",
+      "nervous_system_direction": "down",
+      "description": "Systematic tense-and-release relaxation method.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Nature Immersion"],
+      "tempo_range_bpm": [50, 65],
+      "texture_density": "low"
+    },
+    {
+      "id": "BREATH_OF_FIRE",
+      "nervous_system_direction": "up",
+      "description": "Rapid breathing that increases alertness and energy.",
+      "preferred_music_styles": ["Light Flow Meditation", "Handpan Relaxation"],
+      "tempo_range_bpm": [70, 95],
+      "texture_density": "medium"
+    },
+    {
+      "id": "CONSCIOUS_CONNECTED_BREATHING",
+      "nervous_system_direction": "strong_up",
+      "description": "Continuous connected breathing intensifying emotional awareness.",
+      "preferred_music_styles": ["Shamanic Breathwork", "Cosmic Ambient"],
+      "tempo_range_bpm": [60, 80],
+      "texture_density": "medium"
+    }
+  ],
+  "psychology_tools": [
+    {
+      "id": "SELF_COMPASSION_PAUSE",
+      "nervous_system_direction": "down",
+      "description": "Practice to reduce self-criticism and threat response through kindness.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Gentle Harp Meditation"],
+      "tempo_range_bpm": [50, 65],
+      "texture_density": "low"
+    },
+    {
+      "id": "GUIDED_IMAGERY_SAFE_PLACE",
+      "nervous_system_direction": "strong_down",
+      "description": "Visualization of a safe place to increase felt safety.",
+      "preferred_music_styles": ["Nature Immersion", "Classic Calm Ambient"],
+      "tempo_range_bpm": [45, 60],
+      "texture_density": "low"
+    },
+    {
+      "id": "THOUGHT_CHALLENGING_LIGHT_CBT",
+      "nervous_system_direction": "neutral",
+      "description": "CBT-style reframing of unhelpful thoughts.",
+      "preferred_music_styles": ["Light Flow Meditation"],
+      "tempo_range_bpm": [60, 75],
+      "texture_density": "low"
+    },
+    {
+      "id": "VALUES_CLARIFICATION_MICRO_ACT",
+      "nervous_system_direction": "neutral",
+      "description": "ACT values check and small aligned step.",
+      "preferred_music_styles": ["Light Flow Meditation", "Cosmic Ambient"],
+      "tempo_range_bpm": [60, 75],
+      "texture_density": "low"
+    },
+    {
+      "id": "IMPLEMENTATION_INTENTIONS_IF_THEN",
+      "nervous_system_direction": "up",
+      "description": "If–Then habit planning for behavior change.",
+      "preferred_music_styles": ["Light Flow Meditation"],
+      "tempo_range_bpm": [65, 85],
+      "texture_density": "low"
+    },
+    {
+      "id": "SOCIAL_SUPPORT_MAPPING",
+      "nervous_system_direction": "down",
+      "description": "Mapping supportive people and resources.",
+      "preferred_music_styles": ["Classic Calm Ambient", "Gentle Harp Meditation"],
+      "tempo_range_bpm": [50, 65],
+      "texture_density": "low"
+    },
+    {
+      "id": "PARADOXICAL_INTENTION_SLEEP",
+      "nervous_system_direction": "strong_down",
+      "description": "Reduces sleep anxiety by removing effort to sleep.",
+      "preferred_music_styles": ["Deep Drone Meditation", "Sound Healing Bowl Session"],
+      "tempo_range_bpm": [40, 50],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "IMPULSE_DELAY_URGE_SURFING",
+      "nervous_system_direction": "neutral",
+      "description": "Observe urges as waves without acting.",
+      "preferred_music_styles": ["Zen Minimal (Japanese style)", "Light Flow Meditation"],
+      "tempo_range_bpm": [55, 70],
+      "texture_density": "low"
+    },
+    {
+      "id": "DIGITAL_BOUNDARY_STRATEGY",
+      "nervous_system_direction": "neutral",
+      "description": "Behavior design plan to reduce screen fatigue.",
+      "preferred_music_styles": ["Zen Minimal (Japanese style)", "Classic Calm Ambient"],
+      "tempo_range_bpm": [55, 70],
+      "texture_density": "low"
+    },
+    {
+      "id": "BEST_POSSIBLE_SELF_VISUALIZATION",
+      "nervous_system_direction": "up",
+      "description": "Future-self visualization restoring motivation and hope.",
+      "preferred_music_styles": ["Cosmic Ambient", "Sacred Choir Atmosphere"],
+      "tempo_range_bpm": [55, 70],
+      "texture_density": "low"
+    },
+    {
+      "id": "LETTER_FOR_CLOSURE_UNSENT",
+      "nervous_system_direction": "down",
+      "description": "Unsent letter exercise to process unresolved emotions.",
+      "preferred_music_styles": ["Deep Drone Meditation", "Sacred Choir Atmosphere"],
+      "tempo_range_bpm": [45, 60],
+      "texture_density": "very_low"
+    },
+    {
+      "id": "POMODORO_MICRO_PLANNING",
+      "nervous_system_direction": "up",
+      "description": "Focus scaffold using short timed work intervals.",
+      "preferred_music_styles": ["Light Flow Meditation"],
+      "tempo_range_bpm": [65, 85],
+      "texture_density": "low"
+    }
+  ]
+}
