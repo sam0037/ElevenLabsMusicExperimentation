@@ -286,7 +286,7 @@ export function ChatPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 h-[calc(100vh-73px)] flex gap-6">
+    <div className="mx-auto mt-10 mb-10 px-4 h-[calc(100vh-73px)] flex gap-6" style={{ width: '90%' }}>
       {/* Sidebar */}
       <div className="w-64 flex flex-col gap-4">
         <Button onClick={createNewConversation} className="w-full">

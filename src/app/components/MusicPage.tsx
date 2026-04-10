@@ -514,7 +514,7 @@ export function MusicPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className="mx-auto mt-10 mb-10" style={{ width: '90%' }}>
       <div className="mb-6 rounded-3xl border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.88),rgba(238,247,255,0.88)_55%,rgba(255,244,224,0.9))] px-6 py-5 shadow-[0_22px_45px_rgba(20,33,61,0.08)] backdrop-blur-sm">
         <h1 className="text-2xl font-semibold tracking-tight mb-2">Eleven Labs Music Generation</h1>
         <p className="text-muted-foreground text-sm max-w-2xl">

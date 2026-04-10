@@ -8,12 +8,38 @@ import react from '@vitejs/plugin-react'
 const historyFilePath = path.resolve(__dirname, 'data/history.json')
 const audioDirPath = path.resolve(__dirname, 'data/audio')
 const apiLogsDirPath = path.resolve(__dirname, 'api_logs')
+const myPrayersClubDownloadsDirPath = path.resolve(__dirname, 'data/myprayersclub_downloads')
 
 interface HistoryStore {
   chatConversations?: unknown[]
   compositionPlans?: unknown[]
   musicGenerations?: unknown[]
   updatedAt?: string
+}
+
+type MyPrayersClubGeneratedMusicMetadata = {
+  toolId?: string
+  feeling?: string
+  root?: string
+  tempo?: number
+  duration?: string
+  fileSize?: string
+  generatedAt?: string
+  processingTime?: string
+}
+
+type MyPrayersClubTrackSummary = {
+  folderName: string
+  folderPath: string
+  audioPath: string
+  songName: string
+  toolId: string
+  feeling: string
+  key: string
+  bpm: number | null
+  duration: string
+  size: string
+  generatedAt: string
 }
 
 async function ensureHistoryFile() {
@@ -29,6 +55,118 @@ async function ensureAudioDir() {
 
 async function ensureApiLogsDir() {
   await fs.mkdir(apiLogsDirPath, { recursive: true })
+}
+
+async function ensureMyPrayersClubDownloadsDir() {
+  await fs.mkdir(myPrayersClubDownloadsDirPath, { recursive: true })
+}
+
+async function readJsonFile(filePath: string) {
+  try {
+    const raw = await fs.readFile(filePath, 'utf-8')
+    return raw.trim() ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function formatBytes(bytes: number) {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B'
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB']
+  const unitIndex = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+  const value = bytes / 1024 ** unitIndex
+  return `${value >= 10 || unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unitIndex]}`
+}
+
+async function listMyPrayersClubTracks(toolId?: string): Promise<{ tracks: MyPrayersClubTrackSummary[]; toolIds: string[] }> {
+  await ensureMyPrayersClubDownloadsDir()
+
+  const entries = await fs.readdir(myPrayersClubDownloadsDirPath, { withFileTypes: true })
+  const trackSummaries = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map(async (entry) => {
+        const folderName = entry.name
+        const folderPath = path.join(myPrayersClubDownloadsDirPath, folderName)
+        const [folderItems, step1, step4, stats] = await Promise.all([
+          fs.readdir(folderPath, { withFileTypes: true }),
+          readJsonFile(path.join(folderPath, 'step1_music_parameters.json')),
+          readJsonFile(path.join(folderPath, 'step4_generated_music.json')),
+          fs.stat(folderPath),
+        ])
+
+        const audioEntry = folderItems.find((item) => item.isFile() && /\.(mp3|wav|m4a|ogg)$/i.test(item.name))
+        if (!audioEntry) {
+          return null
+        }
+
+        const audioRelativePath = `data/myprayersclub_downloads/${folderName}/${audioEntry.name}`
+        const audioStats = await fs.stat(path.join(folderPath, audioEntry.name))
+        const generatedMusic = (step4 ?? {}) as MyPrayersClubGeneratedMusicMetadata
+        const parameters = (step1 ?? {}) as { key?: string; tempo_bpm?: number }
+        const generatedAt = String(generatedMusic.generatedAt || stats.mtime.toISOString())
+        const summary: MyPrayersClubTrackSummary = {
+          folderName,
+          folderPath: `data/myprayersclub_downloads/${folderName}`,
+          audioPath: audioRelativePath,
+          songName: folderName,
+          toolId: String(generatedMusic.toolId || ''),
+          feeling: String(generatedMusic.feeling || ''),
+          key: String(generatedMusic.root || parameters.key || ''),
+          bpm: typeof generatedMusic.tempo === 'number' ? generatedMusic.tempo : typeof parameters.tempo_bpm === 'number' ? parameters.tempo_bpm : null,
+          duration: String(generatedMusic.duration || 'N/A'),
+          size: String(generatedMusic.fileSize || formatBytes(audioStats.size)),
+          generatedAt,
+        }
+
+        return summary
+      }),
+  )
+
+  const allTracks = trackSummaries
+    .filter((track): track is MyPrayersClubTrackSummary => Boolean(track))
+  const tracks = allTracks
+    .filter((track) => !toolId || track.toolId === toolId)
+    .sort((left, right) => new Date(right.generatedAt).getTime() - new Date(left.generatedAt).getTime())
+
+  const toolIds = [...new Set(allTracks
+    .map((track) => track.toolId)
+    .filter(Boolean))]
+    .sort()
+
+  return { tracks, toolIds }
+}
+
+async function getMyPrayersClubTrack(folderName: string) {
+  await ensureMyPrayersClubDownloadsDir()
+
+  const safeFolderName = sanitizePathSegment(folderName)
+  const folderPath = path.join(myPrayersClubDownloadsDirPath, safeFolderName)
+  const folderItems = await fs.readdir(folderPath, { withFileTypes: true })
+  const audioEntry = folderItems.find((item) => item.isFile() && /\.(mp3|wav|m4a|ogg)$/i.test(item.name))
+
+  if (!audioEntry) {
+    throw new Error('Saved track audio file not found')
+  }
+
+  const [parameters, compositionPlan, elevenLabsPlan, generatedMusic] = await Promise.all([
+    readJsonFile(path.join(folderPath, 'step1_music_parameters.json')),
+    readJsonFile(path.join(folderPath, 'step2_composition_planner.json')),
+    readJsonFile(path.join(folderPath, 'step3_elevenlabs_composition_plan.json')),
+    readJsonFile(path.join(folderPath, 'step4_generated_music.json')),
+  ])
+
+  return {
+    folderName: safeFolderName,
+    audioPath: `data/myprayersclub_downloads/${safeFolderName}/${audioEntry.name}`,
+    parameters: parameters ?? {},
+    compositionPlan: compositionPlan ?? {},
+    elevenLabsPlan: elevenLabsPlan ?? {},
+    generatedMusic: generatedMusic ?? {},
+  }
 }
 
 async function readHistoryFile(): Promise<HistoryStore> {
@@ -232,6 +370,155 @@ function localHistoryPlugin() {
 
         res.statusCode = 405
         res.end()
+      })
+
+      server.middlewares.use('/api/myprayersclub-export', async (req: any, res: any) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        let body = ''
+        req.on('data', (chunk: Buffer) => {
+          body += chunk.toString()
+        })
+        req.on('end', async () => {
+          try {
+            const payload = body
+              ? (JSON.parse(body) as {
+                  folderName?: string
+                  audioBase64?: string
+                  audioFileName?: string
+                  parameters?: unknown
+                  compositionPlan?: unknown
+                  elevenLabsPlan?: unknown
+                  generatedMusic?: unknown
+                })
+              : {}
+
+            const folderName = sanitizePathSegment(payload.folderName || `bundle_${Date.now()}`)
+            const targetDir = path.join(myPrayersClubDownloadsDirPath, folderName)
+            const audioFileName = sanitizePathSegment(payload.audioFileName || 'generated_music.mp3')
+            const audioBase64 = payload.audioBase64 || ''
+
+            await ensureMyPrayersClubDownloadsDir()
+            await fs.mkdir(targetDir, { recursive: true })
+
+            const files: string[] = []
+
+            await fs.writeFile(
+              path.join(targetDir, 'step1_music_parameters.json'),
+              JSON.stringify(payload.parameters ?? {}, null, 2),
+              'utf-8',
+            )
+            files.push(`data/myprayersclub_downloads/${folderName}/step1_music_parameters.json`)
+
+            await fs.writeFile(
+              path.join(targetDir, 'step2_composition_planner.json'),
+              JSON.stringify(payload.compositionPlan ?? {}, null, 2),
+              'utf-8',
+            )
+            files.push(`data/myprayersclub_downloads/${folderName}/step2_composition_planner.json`)
+
+            await fs.writeFile(
+              path.join(targetDir, 'step3_elevenlabs_composition_plan.json'),
+              JSON.stringify(payload.elevenLabsPlan ?? {}, null, 2),
+              'utf-8',
+            )
+            files.push(`data/myprayersclub_downloads/${folderName}/step3_elevenlabs_composition_plan.json`)
+
+            await fs.writeFile(
+              path.join(targetDir, 'step4_generated_music.json'),
+              JSON.stringify(payload.generatedMusic ?? {}, null, 2),
+              'utf-8',
+            )
+            files.push(`data/myprayersclub_downloads/${folderName}/step4_generated_music.json`)
+
+            const audioBuffer = Buffer.from(audioBase64, 'base64')
+            await fs.writeFile(path.join(targetDir, audioFileName), audioBuffer)
+            files.push(`data/myprayersclub_downloads/${folderName}/${audioFileName}`)
+
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 200
+            res.end(
+              JSON.stringify({
+                ok: true,
+                folderPath: `data/myprayersclub_downloads/${folderName}`,
+                audioPath: `data/myprayersclub_downloads/${folderName}/${audioFileName}`,
+                files,
+              }),
+            )
+          } catch (error) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 500
+            res.end(
+              JSON.stringify({
+                ok: false,
+                error: error instanceof Error ? error.message : 'Failed to export MyPrayersClub bundle',
+              }),
+            )
+          }
+        })
+      })
+
+      server.middlewares.use('/api/myprayersclub-tracks', async (req: any, res: any) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        try {
+          const requestUrl = new URL(req.url || '', 'http://localhost')
+          const toolId = requestUrl.searchParams.get('toolId') || undefined
+          const data = await listMyPrayersClubTracks(toolId)
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 200
+          res.end(JSON.stringify({ ok: true, ...data }))
+        } catch (error) {
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 500
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: error instanceof Error ? error.message : 'Failed to list MyPrayersClub tracks',
+            }),
+          )
+        }
+      })
+
+      server.middlewares.use('/api/myprayersclub-track', async (req: any, res: any) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        try {
+          const requestUrl = new URL(req.url || '', 'http://localhost')
+          const folderName = requestUrl.searchParams.get('folderName')
+          if (!folderName) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 400
+            res.end(JSON.stringify({ ok: false, error: 'folderName is required' }))
+            return
+          }
+
+          const track = await getMyPrayersClubTrack(folderName)
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 200
+          res.end(JSON.stringify({ ok: true, track }))
+        } catch (error) {
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 500
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: error instanceof Error ? error.message : 'Failed to load MyPrayersClub track',
+            }),
+          )
+        }
       })
     },
   }

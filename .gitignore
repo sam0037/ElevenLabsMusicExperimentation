@@ -1,0 +1,13 @@
+.local/
+
+api_logs/*
+
+data/*
+
+dist/*
+
+node_modules/*
+
+music_composer_python/__pycache__/*
+
+.DS_Store
