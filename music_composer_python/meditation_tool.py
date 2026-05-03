@@ -47,7 +47,15 @@ class MeditationTool:
             "tool_type": self.tool_type
         }
 
+def get_meditation_tool_by_id(tool_id: str) -> MeditationTool | None:
+    tools = get_all_meditation_tools()
+    for tool in tools:
+        if tool.id == tool_id:
+            return tool
+    return None
+
 def get_all_meditation_tools() -> list[MeditationTool]:
+    
     # Read the meditation tools from the JSON file and return a list of MeditationTool instances
     with open('./meditation_tool.json', 'r') as f:
         data = json.load(f)

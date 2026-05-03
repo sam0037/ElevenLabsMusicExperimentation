@@ -1,0 +1,50 @@
+{
+    "id": "elara_voss",
+    "name": "Elara Voss",
+    "theme": "Deep Space Stillness",
+    "theme_description": "A minimal, immersive soundscape with slow evolving tones and subtle pulses. Designed to quiet the mind and dissolve attention into a continuous field of sound.",
+    "description": "Elara Voss composes ultra-minimal ambient soundscapes focused on stillness and depth. The music emphasizes sustained tones, subtle harmonic shifts, and expansive space, enabling deep meditative absorption and nervous system reset.",
+    "feels_like": [
+        "weightless",
+        "timeless",
+        "spacious",
+        "hypnotic"
+    ],
+    "best_for": [
+        "Sleep preparation",
+        "Deep meditation",
+        "Nervous system reset"
+    ],
+    "persona": {
+        "harmonic_system": "static_drone",
+        "temporal_system": "no_pulse_or_ultra_slow",
+        "melodic_grammar": "minimal_or_none",
+        "density": "very_low",
+        "evolution": "stable",
+        "energy": "deep_down"
+    },
+    "style": {
+        "name": "Deep Drone Meditation",
+        "timbre_bias": [
+            "synth_drone",
+            "harmonic_drone",
+            "tibetan_bowl_bass",
+            "singing_bowl"
+        ],
+        "rhythm": "none",
+        "ornamentation": "none",
+        "harmonic_behavior": "drone_based",
+        "scale_system": "tonal_ambiguous",
+        "adaptation_rules": {
+            "remove_rhythm_if_present": true,
+            "increase_reverb_if_deep": true
+        }
+    },
+    "rendering_hints": {
+        "tempo_strategy": "40-55_bpm_or_free",
+        "layering_strategy": "single_drone_then_micro_variation",
+        "melody_density": "none_or_extremely_sparse",
+        "loop_behavior": "imperceptible_loop",
+        "texture_curve_preference": "CURVE_STABLE"
+    }
+}

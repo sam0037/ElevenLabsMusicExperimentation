@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Music, BookHeart, Clapperboard } from "lucide-react";
+import { BookHeart, Clapperboard, Library, Music, Sparkles } from "lucide-react";
 
 export function RootLayout() {
   const location = useLocation();
@@ -52,6 +52,28 @@ export function RootLayout() {
             >
               <Music className="w-5 h-5" />
               <span>ElevenLab</span>
+            </Link>
+            <Link
+              to="/looplab"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border transition-all ${
+                location.pathname === '/looplab'
+                  ? 'border-white/30 bg-[linear-gradient(135deg,#0f6cbd_0%,#0ea5e9_60%,#67e8f9_100%)] text-white shadow-[0_14px_30px_rgba(15,108,189,0.28)]'
+                  : 'border-transparent text-muted-foreground hover:border-white/80 hover:text-foreground hover:bg-white/85'
+              }`}
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>LoopLab</span>
+            </Link>
+            <Link
+              to="/instrument-library"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border transition-all ${
+                location.pathname === '/instrument-library'
+                  ? 'border-white/30 bg-[linear-gradient(135deg,#0f6cbd_0%,#0ea5e9_60%,#67e8f9_100%)] text-white shadow-[0_14px_30px_rgba(15,108,189,0.28)]'
+                  : 'border-transparent text-muted-foreground hover:border-white/80 hover:text-foreground hover:bg-white/85'
+              }`}
+            >
+              <Library className="w-5 h-5" />
+              <span>Instrument Library</span>
             </Link>
           </nav>
         </div>

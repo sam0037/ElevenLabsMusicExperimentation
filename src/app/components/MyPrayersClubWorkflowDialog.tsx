@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
 import {
   generateMusicTrackParameters,
   type MeditationTool,
@@ -92,19 +93,19 @@ export function MyPrayersClubWorkflowDialog({
   const stepCopy = {
     1: {
       title: "Generate Parameters",
-      description: "Step 1 generates music track parameters from the meditation tool rules in `meditation_tool_to_music_generator.py`.",
+      description: "Step 1: Generates music track parameters.",
     },
     2: {
       title: "Composition Planner",
-      description: "Step 2 builds the structured composition planner from `music_template_generator.py`.",
+      description: "Step 2: Builds the structured composition planner.",
     },
     3: {
       title: "ElevenLab Composition Plan",
-      description: "Step 3 sends the composition planner into ElevenLabs `createCompositionPlan` and shows the API response.",
+      description: "Step 3: Sends the composition planner into ElevenLabs.",
     },
     4: {
       title: "Generate Music",
-      description: "Step 4 uses the ElevenLabs composition plan to generate the final audio track and save the output bundle.",
+      description: "Step 4: Generate instrumental music track using the ElevenLabs.",
     },
   } as const;
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -120,6 +121,7 @@ export function MyPrayersClubWorkflowDialog({
   const [currentStep, setCurrentStep] = useState<WorkflowStep>(workflowSeed?.currentStep ?? 1);
   const [highestStepReached, setHighestStepReached] = useState<WorkflowStep>(workflowSeed?.highestStepReached ?? 1);
   const [isPlayingGeneratedMusic, setIsPlayingGeneratedMusic] = useState(false);
+  const [isGeneratedMusicLoopEnabled, setIsGeneratedMusicLoopEnabled] = useState(true);
   const [lockPreviousStepRegeneration, setLockPreviousStepRegeneration] = useState(Boolean(workflowSeed?.lockPreviousStepRegeneration));
 
   useEffect(() => {
@@ -135,6 +137,7 @@ export function MyPrayersClubWorkflowDialog({
     setCurrentStep(workflowSeed.currentStep);
     setHighestStepReached(workflowSeed.highestStepReached);
     setIsPlayingGeneratedMusic(false);
+    setIsGeneratedMusicLoopEnabled(true);
     setLockPreviousStepRegeneration(Boolean(workflowSeed.lockPreviousStepRegeneration));
   }, [open, workflowSeed]);
 
@@ -243,7 +246,7 @@ export function MyPrayersClubWorkflowDialog({
 
     try {
       const elevenLabsService = new ElevenLabsService();
-      const response = await elevenLabsService.createCompositionPlan(
+      const response = await elevenLabsService.createMeditationCompositionPlan(
         JSON.stringify(generatedPlan),
       );
       setGeneratedElevenLabsPlan(response);
@@ -308,7 +311,7 @@ export function MyPrayersClubWorkflowDialog({
 
     try {
       const elevenLabsService = new ElevenLabsService();
-      const response = await elevenLabsService.generateMusic("", generatedElevenLabsPlan);
+      const response = await elevenLabsService.generateMeditationMusic(generatedElevenLabsPlan);
       const audioUrl = URL.createObjectURL(response.audioBlob);
       replaceGeneratedMusic(buildGeneratedMusicFromResponse(response, audioUrl));
 
@@ -512,7 +515,7 @@ export function MyPrayersClubWorkflowDialog({
                         Composition Planner
                       </p>
                       <p className="mt-2 text-lg font-medium text-foreground">
-                        Template generation from `music_template_generator.py`
+                        Template generation based on music track parameters
                       </p>
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         This step uses the generated feeling, key, tempo, and duration to assemble a four-section instrumental composition plan.
@@ -688,7 +691,7 @@ export function MyPrayersClubWorkflowDialog({
                         ElevenLab Composition Plan
                       </p>
                       <p className="mt-2 text-lg font-medium text-foreground">
-                        API plan generation from `createCompositionPlan`
+                        Create ElevenLabs compatible composition plan from the generated template
                       </p>
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         This step sends the generated composition planner output to ElevenLabs and displays the returned JSON response in a structured view.
@@ -830,7 +833,7 @@ export function MyPrayersClubWorkflowDialog({
                         </div>
                       ) : (
                         <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-sm leading-6 text-muted-foreground">
-                          No ElevenLab composition plan generated yet. Use the button above to call `createCompositionPlan` from the ElevenLabs service.
+                          No ElevenLab composition plan generated yet. Use the button above to create a composition plan from the ElevenLabs.
                         </div>
                       )}
                     </div>
@@ -842,10 +845,10 @@ export function MyPrayersClubWorkflowDialog({
                         Generate Music
                       </p>
                       <p className="mt-2 text-lg font-medium text-foreground">
-                        Final step using the ElevenLabs composition plan
+                        Generate track using the ElevenLabs composition plan
                       </p>
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                        This final step uses the `generateMusic` method with the ElevenLabs Composition Plan from step 3, then lets you preview the audio and save the full bundle into `data/myprayersclub_downloads`.
+                        This final step uses the ElevenLabs Composition Plan from previous step, then lets you preview the audio and download the track.
                       </p>
                     </div>
 
@@ -911,20 +914,35 @@ export function MyPrayersClubWorkflowDialog({
                                   {selectedTool ? formatToolName(selectedTool.id) : "Generated Track"}
                                 </p>
                               </div>
-                              <Button onClick={handleToggleGeneratedMusic}>
-                                {isPlayingGeneratedMusic ? (
-                                  <Pause className="h-4 w-4" />
-                                ) : (
-                                  <Play className="h-4 w-4" />
-                                )}
-                                {isPlayingGeneratedMusic ? "Pause" : "Play"}
-                              </Button>
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Button onClick={handleToggleGeneratedMusic}>
+                                  {isPlayingGeneratedMusic ? (
+                                    <Pause className="h-4 w-4" />
+                                  ) : (
+                                    <Play className="h-4 w-4" />
+                                  )}
+                                  {isPlayingGeneratedMusic ? "Pause" : "Play"}
+                                </Button>
+                                <label
+                                  htmlFor="generated-music-loop"
+                                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm font-medium text-foreground"
+                                >
+                                  <Checkbox
+                                    id="generated-music-loop"
+                                    checked={isGeneratedMusicLoopEnabled}
+                                    onCheckedChange={(checked) => setIsGeneratedMusicLoopEnabled(checked === true)}
+                                    aria-label="Loop generated track"
+                                  />
+                                  <span>Loop</span>
+                                </label>
+                              </div>
                             </div>
                             <audio
                               ref={audioRef}
                               className="mt-4 w-full"
                               src={generatedMusic.audioUrl}
                               controls
+                              loop={isGeneratedMusicLoopEnabled}
                               onPlay={() => setIsPlayingGeneratedMusic(true)}
                               onPause={() => setIsPlayingGeneratedMusic(false)}
                               onEnded={() => setIsPlayingGeneratedMusic(false)}

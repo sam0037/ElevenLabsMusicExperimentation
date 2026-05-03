@@ -44,9 +44,11 @@ export type MusicCompositionPlan = {
   sections: MusicCompositionSection[];
 };
 
-type InstrumentProfile = {
+export type InstrumentCategory = "ambient" | "melodic" | "percussion" | "texture" | "others";
+
+export type InstrumentProfile = {
   name: string;
-  category: "ambient" | "melodic" | "percussion" | "texture" | "others";
+  category: InstrumentCategory;
   tags: string[];
   baseWeight: number;
   targets: Partial<Record<keyof EmotionalState, number>>;
@@ -81,7 +83,7 @@ const DEGREE_MAP: Record<string, number> = {
   vii: 6,
 };
 
-const INSTRUMENT_LIBRARY: InstrumentProfile[] = [
+export const INSTRUMENT_LIBRARY: InstrumentProfile[] = [
   { name: "tanpura", category: "ambient", tags: ["drone", "organic", "warm", "stable", "sustained"], baseWeight: 1.4, targets: { v: -0.2, a: 0.08, b: 0.14, t: 0.45, d: 0.3, m: 0.05 }, weights: { v: 0.8, a: 0.8, b: 0.8, t: 1, d: 0.8, m: 1 } },
   { name: "shruti_box", category: "ambient", tags: ["drone", "supportive", "warm", "stable", "sustained"], baseWeight: 1.35, targets: { v: -0.1, a: 0.08, b: 0.18, t: 0.4, d: 0.32, m: 0.06 }, weights: { v: 0.8, a: 0.8, b: 0.8, t: 1, d: 0.8, m: 1 } },
   { name: "harmonium_drone", category: "ambient", tags: ["drone", "reed", "devotional", "warm", "sustained"], baseWeight: 1.2, targets: { v: -0.05, a: 0.1, b: 0.22, t: 0.35, d: 0.35, m: 0.08 }, weights: { v: 0.7, a: 0.8, b: 0.7, t: 0.8, d: 0.9, m: 1 } },

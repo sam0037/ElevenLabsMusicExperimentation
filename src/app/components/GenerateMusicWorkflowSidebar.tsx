@@ -47,7 +47,10 @@ export function GenerateMusicWorkflowSidebar({
                 </span>
                 {isCurrent ? (
                   <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-800">
-                    Current
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="inline">
+                      <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="6" cy="6" r="2" fill="currentColor" />
+                    </svg>
                   </span>
                 ) : null}
               </div>

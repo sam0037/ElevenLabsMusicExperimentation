@@ -3,6 +3,8 @@ from typing import Dict
 from emotional_state import EmotionalState
 from emotional_space import FEELINGS, FEELING_BIASES
 from meditation_tool import MeditationTool
+from artist import ArtistProfile
+from music_composer_python.artist_functions import apply_persona_to_state
 
 # =========================================================
 # MEDITATION TOOL → STATE MAPPING
@@ -155,6 +157,58 @@ def compute_4bar_duration_ms(bpm: float) -> int:
 # =========================================================
 # MAIN ENGINE
 # =========================================================
+
+def meditation_tool_to_music_v2(
+    meditation_tool: MeditationTool,
+    artist_profile: ArtistProfile
+):
+    """
+    Input:
+        meditation_tool (dict):
+            {
+                "id": "...",
+                "nervous_system_direction": "...",
+                "tempo_range_bpm": [min, max],
+                "texture_density": "low|medium|..."
+            }
+
+    Output:
+        {
+            "feeling": str,
+            "key": str,
+            "tempo_bpm": int,
+            "duration_4bar_ms": int
+        }
+    """
+
+    # Step 1: Tool → Emotional State
+    state = tool_to_state(meditation_tool.to_dict())
+
+    # Step 2: Apply artist persona to state
+    state = apply_persona_to_state(state, artist_profile.persona)
+
+    # Step 3: State → Feeling
+    feeling = select_feeling(state)
+
+    # Step 4: Feeling → Mode
+    mode = FEELINGS[feeling]["base_mode"]
+
+    # Step 5: State → Key
+    key = select_key(state)
+
+    # Step 6: Tempo (quantized)
+    tempo = suggest_quantized_tempo(state, meditation_tool.tempo_range_bpm)
+
+    # Step 7: Duration (4-bar loop)
+    duration_4bar_ms = compute_4bar_duration_ms(tempo)
+
+    return {
+        "feeling": feeling,
+        "key": key,
+        "mode": mode,
+        "tempo_bpm": tempo,
+        "duration_4bar_ms": duration_4bar_ms
+    }
 
 def meditation_tool_to_music(
     meditation_tool: MeditationTool

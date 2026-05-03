@@ -9,6 +9,7 @@ const historyFilePath = path.resolve(__dirname, 'data/history.json')
 const audioDirPath = path.resolve(__dirname, 'data/audio')
 const apiLogsDirPath = path.resolve(__dirname, 'api_logs')
 const myPrayersClubDownloadsDirPath = path.resolve(__dirname, 'data/myprayersclub_downloads')
+const loopLabDownloadsDirPath = path.resolve(__dirname, 'data/looplab_downloads')
 
 interface HistoryStore {
   chatConversations?: unknown[]
@@ -42,6 +43,57 @@ type MyPrayersClubTrackSummary = {
   generatedAt: string
 }
 
+type LoopLabRequestPayload = {
+  experimentTitle?: string
+  text?: string
+  output_format?: string
+  loop?: boolean
+  repeatTrack?: number
+  duration_seconds?: number
+  prompt_influence?: number
+  model_id?: string
+}
+
+type LoopLabResponsePayload = {
+  format?: string
+  duration?: string
+  fileSize?: string
+  processingTime?: string
+  mimeType?: string
+  characterCost?: string
+  generatedAt?: string
+}
+
+type LoopLabTrackSummary = {
+  folderName: string
+  folderPath: string
+  audioPath?: string
+  title: string
+  promptPreview: string
+  outputFormat: string
+  durationSeconds: number | null
+  promptInfluence: number | null
+  repeatTrack: number | null
+  loop: boolean
+  modelId: string
+  reviewTag: 'Good' | 'Ok' | 'Bad' | null
+  status: 'success' | 'error'
+  size: string
+  generatedAt: string
+}
+
+type LoopLabReview = {
+  notes?: string
+  tag?: 'Good' | 'Ok' | 'Bad' | null
+  updatedAt?: string
+}
+
+function pickPrimaryLoopLabAudioFile(fileNames: string[]) {
+  return fileNames.find((fileName) => /^generated_loop\./i.test(fileName))
+    || fileNames.find((fileName) => /^actual_track\./i.test(fileName))
+    || fileNames[0]
+}
+
 async function ensureHistoryFile() {
   await fs.mkdir(path.dirname(historyFilePath), { recursive: true })
   if (!existsSync(historyFilePath)) {
@@ -59,6 +111,10 @@ async function ensureApiLogsDir() {
 
 async function ensureMyPrayersClubDownloadsDir() {
   await fs.mkdir(myPrayersClubDownloadsDirPath, { recursive: true })
+}
+
+async function ensureLoopLabDownloadsDir() {
+  await fs.mkdir(loopLabDownloadsDirPath, { recursive: true })
 }
 
 async function readJsonFile(filePath: string) {
@@ -166,6 +222,96 @@ async function getMyPrayersClubTrack(folderName: string) {
     compositionPlan: compositionPlan ?? {},
     elevenLabsPlan: elevenLabsPlan ?? {},
     generatedMusic: generatedMusic ?? {},
+  }
+}
+
+async function listLoopLabTracks(): Promise<LoopLabTrackSummary[]> {
+  await ensureLoopLabDownloadsDir()
+
+  const entries = await fs.readdir(loopLabDownloadsDirPath, { withFileTypes: true })
+  const trackSummaries = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map(async (entry) => {
+        const folderName = entry.name
+        const folderPath = path.join(loopLabDownloadsDirPath, folderName)
+        const [folderItems, requestData, responseData, errorData, reviewData, stats] = await Promise.all([
+          fs.readdir(folderPath, { withFileTypes: true }),
+          readJsonFile(path.join(folderPath, 'request.json')),
+          readJsonFile(path.join(folderPath, 'response.json')),
+          readJsonFile(path.join(folderPath, 'error.json')),
+          readJsonFile(path.join(folderPath, 'review.json')),
+          fs.stat(folderPath),
+        ])
+
+        const request = (requestData ?? {}) as LoopLabRequestPayload
+        const response = (responseData ?? {}) as LoopLabResponsePayload
+        const review = (reviewData ?? {}) as LoopLabReview
+        const hasError = Boolean(errorData)
+        const audioFileNames = folderItems
+          .filter((item) => item.isFile() && /\.(mp3|wav|m4a|ogg)$/i.test(item.name))
+          .map((item) => item.name)
+        const primaryAudioFileName = pickPrimaryLoopLabAudioFile(audioFileNames)
+        const audioEntry = primaryAudioFileName
+          ? folderItems.find((item) => item.isFile() && item.name === primaryAudioFileName)
+          : undefined
+        const audioPath = audioEntry ? `data/looplab_downloads/${folderName}/${audioEntry.name}` : undefined
+        const audioStats = audioEntry ? await fs.stat(path.join(folderPath, audioEntry.name)) : null
+        const prompt = String(request.text || '')
+        const generatedAt = String(response.generatedAt || stats.mtime.toISOString())
+
+        const summary: LoopLabTrackSummary = {
+          folderName,
+          folderPath: `data/looplab_downloads/${folderName}`,
+          audioPath,
+          title: String(request.experimentTitle || prompt.slice(0, 48) || folderName),
+          promptPreview: prompt.slice(0, 140),
+          outputFormat: String(request.output_format || 'mp3_44100_192'),
+          durationSeconds: typeof request.duration_seconds === 'number' ? request.duration_seconds : null,
+          promptInfluence: typeof request.prompt_influence === 'number' ? request.prompt_influence : null,
+          repeatTrack: typeof request.repeatTrack === 'number' ? request.repeatTrack : null,
+          loop: Boolean(request.loop),
+          modelId: String(request.model_id || 'eleven_text_to_sound_v2'),
+          reviewTag: review.tag === 'Good' || review.tag === 'Ok' || review.tag === 'Bad' ? review.tag : null,
+          status: hasError ? 'error' : 'success',
+          size: String(response.fileSize || (audioStats ? formatBytes(audioStats.size) : 'N/A')),
+          generatedAt,
+        }
+
+        return summary
+      }),
+  )
+
+  return trackSummaries.sort((left, right) => new Date(right.generatedAt).getTime() - new Date(left.generatedAt).getTime())
+}
+
+async function getLoopLabTrack(folderName: string) {
+  await ensureLoopLabDownloadsDir()
+
+  const safeFolderName = sanitizePathSegment(folderName)
+  const folderPath = path.join(loopLabDownloadsDirPath, safeFolderName)
+  const folderItems = await fs.readdir(folderPath, { withFileTypes: true })
+  const audioFileNames = folderItems
+    .filter((item) => item.isFile() && /\.(mp3|wav|m4a|ogg)$/i.test(item.name))
+    .map((item) => item.name)
+  const primaryAudioFileName = pickPrimaryLoopLabAudioFile(audioFileNames)
+  const audioEntry = primaryAudioFileName
+    ? folderItems.find((item) => item.isFile() && item.name === primaryAudioFileName)
+    : undefined
+  const [request, response, error, review] = await Promise.all([
+    readJsonFile(path.join(folderPath, 'request.json')),
+    readJsonFile(path.join(folderPath, 'response.json')),
+    readJsonFile(path.join(folderPath, 'error.json')),
+    readJsonFile(path.join(folderPath, 'review.json')),
+  ])
+
+  return {
+    folderName: safeFolderName,
+    audioPath: audioEntry ? `data/looplab_downloads/${safeFolderName}/${audioEntry.name}` : undefined,
+    request: request ?? {},
+    response: response ?? {},
+    error: error ?? null,
+    review: review ?? { notes: '', tag: null },
   }
 }
 
@@ -519,6 +665,222 @@ function localHistoryPlugin() {
             }),
           )
         }
+      })
+
+      server.middlewares.use('/api/looplab-export', async (req: any, res: any) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        let body = ''
+        req.on('data', (chunk: Buffer) => {
+          body += chunk.toString()
+        })
+        req.on('end', async () => {
+          try {
+            const payload = body
+              ? (JSON.parse(body) as {
+                  folderName?: string
+                  audioBase64?: string
+                  audioFileName?: string
+                  actualAudioBase64?: string
+                  actualAudioFileName?: string
+                  request?: unknown
+                  response?: unknown
+                  error?: unknown
+                })
+              : {}
+
+            const folderName = sanitizePathSegment(payload.folderName || `looplab_${Date.now()}`)
+            const targetDir = path.join(loopLabDownloadsDirPath, folderName)
+            const files: string[] = []
+
+            await ensureLoopLabDownloadsDir()
+            await fs.mkdir(targetDir, { recursive: true })
+
+            await fs.writeFile(
+              path.join(targetDir, 'request.json'),
+              JSON.stringify(payload.request ?? {}, null, 2),
+              'utf-8',
+            )
+            files.push(`data/looplab_downloads/${folderName}/request.json`)
+
+            if (payload.response !== undefined) {
+              await fs.writeFile(
+                path.join(targetDir, 'response.json'),
+                JSON.stringify(payload.response, null, 2),
+                'utf-8',
+              )
+              files.push(`data/looplab_downloads/${folderName}/response.json`)
+            }
+
+            if (payload.error !== undefined && payload.error !== null) {
+              await fs.writeFile(
+                path.join(targetDir, 'error.json'),
+                JSON.stringify(payload.error, null, 2),
+                'utf-8',
+              )
+              files.push(`data/looplab_downloads/${folderName}/error.json`)
+            }
+
+            let audioPath: string | undefined
+            if (payload.audioBase64) {
+              const safeAudioFileName = sanitizePathSegment(payload.audioFileName || 'generated_loop.mp3')
+              const audioBuffer = Buffer.from(payload.audioBase64, 'base64')
+              await fs.writeFile(path.join(targetDir, safeAudioFileName), audioBuffer)
+              audioPath = `data/looplab_downloads/${folderName}/${safeAudioFileName}`
+              files.push(audioPath)
+            }
+
+            if (payload.actualAudioBase64) {
+              const safeActualAudioFileName = sanitizePathSegment(payload.actualAudioFileName || 'actual_track.mp3')
+              const actualAudioBuffer = Buffer.from(payload.actualAudioBase64, 'base64')
+              await fs.writeFile(path.join(targetDir, safeActualAudioFileName), actualAudioBuffer)
+              files.push(`data/looplab_downloads/${folderName}/${safeActualAudioFileName}`)
+            }
+
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 200
+            res.end(
+              JSON.stringify({
+                ok: true,
+                folderPath: `data/looplab_downloads/${folderName}`,
+                audioPath,
+                files,
+              }),
+            )
+          } catch (error) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 500
+            res.end(
+              JSON.stringify({
+                ok: false,
+                error: error instanceof Error ? error.message : 'Failed to export LoopLab attempt',
+              }),
+            )
+          }
+        })
+      })
+
+      server.middlewares.use('/api/looplab-tracks', async (req: any, res: any) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        try {
+          const tracks = await listLoopLabTracks()
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 200
+          res.end(JSON.stringify({ ok: true, tracks }))
+        } catch (error) {
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 500
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: error instanceof Error ? error.message : 'Failed to list LoopLab tracks',
+            }),
+          )
+        }
+      })
+
+      server.middlewares.use('/api/looplab-track', async (req: any, res: any) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        try {
+          const requestUrl = new URL(req.url || '', 'http://localhost')
+          const folderName = requestUrl.searchParams.get('folderName')
+          if (!folderName) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 400
+            res.end(JSON.stringify({ ok: false, error: 'folderName is required' }))
+            return
+          }
+
+          const track = await getLoopLabTrack(folderName)
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 200
+          res.end(JSON.stringify({ ok: true, track }))
+        } catch (error) {
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 500
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: error instanceof Error ? error.message : 'Failed to load LoopLab track',
+            }),
+          )
+        }
+      })
+
+      server.middlewares.use('/api/looplab-track-review', async (req: any, res: any) => {
+        if (req.method !== 'PUT') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        let body = ''
+        req.on('data', (chunk: Buffer) => {
+          body += chunk.toString()
+        })
+        req.on('end', async () => {
+          try {
+            const payload = body
+              ? (JSON.parse(body) as {
+                  folderName?: string
+                  review?: LoopLabReview
+                })
+              : {}
+
+            const folderName = sanitizePathSegment(payload.folderName || '')
+            if (!folderName) {
+              res.setHeader('Content-Type', 'application/json')
+              res.statusCode = 400
+              res.end(JSON.stringify({ ok: false, error: 'folderName is required' }))
+              return
+            }
+
+            const targetDir = path.join(loopLabDownloadsDirPath, folderName)
+            await ensureLoopLabDownloadsDir()
+            await fs.mkdir(targetDir, { recursive: true })
+
+            const review: LoopLabReview = {
+              notes: String(payload.review?.notes || ''),
+              tag: payload.review?.tag === 'Good' || payload.review?.tag === 'Ok' || payload.review?.tag === 'Bad'
+                ? payload.review.tag
+                : null,
+              updatedAt: new Date().toISOString(),
+            }
+
+            await fs.writeFile(
+              path.join(targetDir, 'review.json'),
+              JSON.stringify(review, null, 2),
+              'utf-8',
+            )
+
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 200
+            res.end(JSON.stringify({ ok: true }))
+          } catch (error) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 500
+            res.end(
+              JSON.stringify({
+                ok: false,
+                error: error instanceof Error ? error.message : 'Failed to save LoopLab review',
+              }),
+            )
+          }
+        })
       })
     },
   }

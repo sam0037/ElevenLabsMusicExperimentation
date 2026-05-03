@@ -1,0 +1,50 @@
+{
+    "id": "anninaini_ali",
+    "name": "Anninaini Ali",
+    "theme": "Indian Classical Flow",
+    "theme_description": "A deeply introspective and spiritual sound rooted in Indian classical traditions. Slow evolving melodies over a continuous drone, guiding attention inward with a sense of devotion and stillness.",
+    "description": "Anninaini Ali is a renowned composer and performer of Indian classical-inspired meditative music. Their work blends traditional raga structures with ambient textures, featuring intricate melodic ornamentation, rich drone layers, and subtle rhythmic cycles that evoke tranquility and spiritual depth.",
+    "feels_like": [
+        "grounded",
+        "sacred",
+        "focused",
+        "emotionally reflective"
+    ],
+    "best_for": [
+        "Breathwork (Bhramari, alternate nostril)",
+        "Deep focus meditation",
+        "Emotional grounding"
+    ],
+    "persona": {
+        "harmonic_system": "drone_modal_raga",
+        "temporal_system": "slow_cyclical",
+        "melodic_grammar": "ornamented_rule_based",
+        "density": "low_to_medium",
+        "evolution": "gradual",
+        "energy": "inward_down"
+    },
+    "style": {
+        "name": "Indian Meditation",
+        "timbre_bias": [
+            "bansuri",
+            "tanpura_drone",
+            "harmonium",
+            "tabla_soft"
+        ],
+        "rhythm": "very_soft_cyclical",
+        "ornamentation": "glide_heavy",
+        "harmonic_behavior": "drone_based",
+        "scale_system": "raga_like",
+        "adaptation_rules": {
+            "reduce_percussion_if_deep": true,
+            "increase_drone_if_down": true
+        }
+    },
+    "rendering_hints": {
+        "tempo_strategy": "50-65_bpm_adaptive",
+        "layering_strategy": "drone_first_then_melody",
+        "melody_density": "sparse_to_moderate",
+        "loop_behavior": "seamless_with_variation",
+        "texture_curve_preference": "CURVE_GENTLE_ARC"
+    }
+}

@@ -16,7 +16,7 @@ export interface ChatCompletionRequest {
   stream?: boolean;
 }
 
-export type TitleContext = "chat" | "plan";
+export type TitleContext = "chat" | "plan" | "looplab";
 
 export interface ChatCompletionResponse {
   id: string;
@@ -241,7 +241,11 @@ export class OpenAIService {
     context: TitleContext
   ): Promise<string> {
     const contextLabel =
-      context === "chat" ? "chat conversation" : "music composition plan";
+      context === "chat"
+        ? "chat conversation"
+        : context === "looplab"
+          ? "LoopLab sound experiment"
+          : "music composition plan";
     const response = await this.createChatCompletion([
       {
         role: "system",

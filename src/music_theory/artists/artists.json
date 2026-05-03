@@ -1,0 +1,20 @@
+[
+    {
+        "id": "anninaini_ali",
+        "filename": "src/music_theory/artists/anninaini_ali.json",
+        "image": "src/music_theory/artists/images/anninaini_ali.png",
+        "enabled": true
+    },
+    {
+        "id": "elara_voss",
+        "filename": "src/music_theory/artists/elara_voss.json",
+        "image": "src/music_theory/artists/images/elara_voss.png",
+        "enabled": true
+    },
+    {
+        "id": "mateo_rivera",
+        "filename": "src/music_theory/artists/mateo_rivera.json",
+        "image": "src/music_theory/artists/images/mateo_rivera.png",
+        "enabled": true
+    }
+]

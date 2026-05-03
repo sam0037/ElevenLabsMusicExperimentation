@@ -1,0 +1,48 @@
+{
+    "id": "mateo_rivera",
+    "name": "Mateo Rivera",
+    "theme": "Warm Acoustic Flow",
+    "theme_description": "A gentle, flowing acoustic sound inspired by folk traditions, with soft melodic phrasing and warm harmonic movement that soothes without overstimulation.",
+    "description": "Mateo Rivera creates warm, acoustic-inspired meditative music blending folk sensibilities with ambient softness. His compositions feature gentle harmonic progressions, expressive yet restrained melodies, and a comforting tonal palette.",
+    "feels_like": [
+        "warm",
+        "comforting",
+        "human",
+        "gently expressive"
+    ],
+    "best_for": [
+        "Relaxation",
+        "Emotional soothing",
+        "Light reflective meditation"
+    ],
+    "persona": {
+        "harmonic_system": "slow_functional_minimal",
+        "temporal_system": "slow_flowing_pulse",
+        "melodic_grammar": "expressive_but_sparse",
+        "density": "low",
+        "evolution": "gentle_arc",
+        "energy": "soft_down"
+    },
+    "style": {
+        "name": "Acoustic Folk Ambient",
+        "timbre_bias": [
+            "breath_flute",
+            "ambient_strings"
+        ],
+        "rhythm": "very_soft_pulse",
+        "ornamentation": "light_expression",
+        "harmonic_behavior": "slow_progression",
+        "scale_system": "minor_or_modal",
+        "adaptation_rules": {
+            "reduce_rhythm_if_deep": true,
+            "simplify_harmony_if_sleep": true
+        }
+    },
+    "rendering_hints": {
+        "tempo_strategy": "55-70_bpm_adaptive",
+        "layering_strategy": "harmony_then_melody",
+        "melody_density": "moderate_but_spaced",
+        "loop_behavior": "soft_loop_with_resolution",
+        "texture_curve_preference": "CURVE_GENTLE_ARC"
+    }
+}

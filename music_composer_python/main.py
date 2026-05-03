@@ -3,10 +3,11 @@ import json
 from music_template_generator import generate_music_template
 from meditation_tool import get_all_meditation_tools, MeditationTool
 from meditation_tool_to_music_generator import meditation_tool_to_music
+from artist import get_artist_profile
 import os
 from pathlib import Path
 
-if __name__ == "__main__":
+def pipeline_v0():
     meditation_tools: list[MeditationTool] = get_all_meditation_tools()
 
     # List all tools and ask user to select one
@@ -40,4 +41,19 @@ if __name__ == "__main__":
         json.dump(generate_music_template(feeling, root, tempo, section_duration_ms), f, indent=0)
 
     print(f"Saved to {filepath}")
+
+def pipeline_v1():
+    # STEP 1: Get artist profile
+    artist = get_artist_profile(artist_id="anninaini_ali")
+    print(json.dumps(artist.to_dict(), indent=4))  # pretty print the artist profile
+
+    # Step 2: Musical Parameter Generation
+    
+
+if __name__ == "__main__":
+
+    # pipeline_v0()  # Original pipeline without artist profile
+    pipeline_v1()  # New pipeline with artist profile integration
+
+    
     
